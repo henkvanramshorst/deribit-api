@@ -22,6 +22,11 @@ func (c *Client) DisableTfaForSubaccount(params *models.DisableTfaForSubaccountP
 	return
 }
 
+func (c *Client) GetAccountSummaries(params *models.GetAccountSummariesParams) (result []models.AccountSummary, err error) {
+	err = c.Call("private/get_account_summaries", params, &result)
+	return
+}
+
 func (c *Client) GetAccountSummary(params *models.GetAccountSummaryParams) (result models.AccountSummary, err error) {
 	err = c.Call("private/get_account_summary", params, &result)
 	return
