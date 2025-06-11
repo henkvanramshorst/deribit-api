@@ -14,6 +14,7 @@ type AccountSummary struct {
 	FuturesSessionUpl         float64 `json:"futures_session_upl"`
 	ID                        int     `json:"id"`
 	InitialMargin             float64 `json:"initial_margin"`
+	Limits                    Limits
 	MaintenanceMargin         float64 `json:"maintenance_margin"`
 	MarginBalance             float64 `json:"margin_balance"`
 	OptionsDelta              float64 `json:"options_delta"`
@@ -32,4 +33,40 @@ type AccountSummary struct {
 	TotalPl                   float64 `json:"total_pl"`
 	Type                      string  `json:"type"`
 	Username                  string  `json:"username"`
+}
+
+type Limits struct {
+	LimitsPerCurrency bool `json:"limits_per_currency"`
+	NonMatchingEngine struct {
+		Burst int `json:"burst"`
+		Rate  int `json:"rate"`
+	} `json:"non_matching_engine"`
+	MatchingEngine struct {
+		Trading struct {
+			Total struct {
+				Burst int `json:"burst"`
+				Rate  int `json:"rate"`
+			} `json:"total"`
+		} `json:"trading"`
+		Spot struct {
+			Burst int `json:"burst"`
+			Rate  int `json:"rate"`
+		} `json:"spot"`
+		MaximumQuotes struct {
+			Burst int `json:"burst"`
+			Rate  int `json:"rate"`
+		} `json:"maximum_quotes"`
+		MaximumMassQuotes struct {
+			Burst int `json:"burst"`
+			Rate  int `json:"rate"`
+		} `json:"maximum_mass_quotes"`
+		GuaranteedMassQuotes struct {
+			Burst int `json:"burst"`
+			Rate  int `json:"rate"`
+		} `json:"guaranteed_mass_quotes"`
+		CancelAll struct {
+			Burst int `json:"burst"`
+			Rate  int `json:"rate"`
+		} `json:"cancel_all"`
+	} `json:"matching_engine"`
 }

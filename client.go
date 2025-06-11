@@ -54,6 +54,7 @@ type Client struct {
 
 	conn        *websocket.Conn
 	rpcConn     *jsonrpc2.Conn
+	rateLimiter *rateLimiter
 	mu          sync.RWMutex
 	heartCancel chan struct{}
 	isConnected bool
@@ -169,6 +170,11 @@ func (c *Client) start() error {
 
 	c.rpcConn = jsonrpc2.NewConn(context.Background(), NewObjectStream(c.conn), c)
 
+	//NOTE: We do not want to reset the limiter on reconnect.
+	if c.rateLimiter == nil {
+		c.rateLimiter = newRateLimiter(context.Background())
+	}
+
 	c.setIsConnected(true)
 
 	// auth
@@ -212,6 +218,10 @@ func (c *Client) Call(method string, params interface{}, result interface{}) (er
 			return ErrAuthenticationIsRequired
 		}
 		token.setToken(c.auth.token)
+	}
+
+	if err = c.rateLimiter.Wait(method); err != nil {
+		return
 	}
 
 	return c.rpcConn.Call(c.ctx, method, params, result)
