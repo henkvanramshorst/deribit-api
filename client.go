@@ -224,7 +224,13 @@ func (c *Client) Call(method string, params interface{}, result interface{}) (er
 		return
 	}
 
-	return c.rpcConn.Call(c.ctx, method, params, result)
+	err = c.rpcConn.Call(c.ctx, method, params, result)
+	var jsonRpcErr *jsonrpc2.Error
+	if errors.As(err, &jsonRpcErr) && jsonRpcErr.Code == 10028 {
+		c.rateLimiter.ReserveAll(method)
+	}
+
+	return
 }
 
 // Handle implements jsonrpc2.Handler
