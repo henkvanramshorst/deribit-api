@@ -3,7 +3,6 @@ package deribit
 import (
 	"context"
 	"golang.org/x/time/rate"
-	"time"
 )
 
 type rateLimiter struct {
@@ -15,8 +14,8 @@ type rateLimiter struct {
 func newRateLimiter(ctx context.Context) *rateLimiter {
 	return &rateLimiter{
 		ctx:    ctx,
-		global: rate.NewLimiter(rate.Limit(5), 20),
-		custom: rate.NewLimiter(rate.Limit(0.1), 5),
+		global: rate.NewLimiter(rate.Limit(5), 1),
+		custom: rate.NewLimiter(rate.Limit(0.1), 1),
 	}
 }
 
@@ -25,12 +24,4 @@ func (r *rateLimiter) Wait(method string) error {
 		return r.custom.Wait(r.ctx)
 	}
 	return r.global.Wait(r.ctx)
-}
-
-func (r *rateLimiter) ReserveAll(method string) {
-	if method == "public/get_instruments" {
-		r.custom.ReserveN(time.Now(), 5)
-	} else {
-		r.global.ReserveN(time.Now(), 20)
-	}
 }
